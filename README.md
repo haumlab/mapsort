@@ -1,16 +1,63 @@
-# React + Vite
+# MapSort
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Mapsort is a project that shows you different map algorithims in real time, its like those tiktoks, its got a pretty nice sound i like the sound.
 
-Currently, two official plugins are available:
+## Key Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- Live Map Integration: Fetches real-world street data dynamically using the Overpass API based on user-selected points.
+- Multiple Algorithms: Supports a variety of pathfinding strategies, including:
+  - A* Search (Heuristic-based)
+  - Dijkstra (Shortest path)
+  - Breadth-First Search (Unweighted exploration)
+  - Greedy Best-First Search
+  - Depth-First Search
+- VS Mode: Allows for side-by-side comparison of two different algorithms running from the same start and end points. This mode highlights unique and shared path segments.
+- Audio Integration: Features auditory feedback that represents the progress of the algorithm's exploration and path tracing.
 
-## React Compiler
+## Technical Stack
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- Frontend: React, Vite
+- Mapping: Leaflet, React-Leaflet
+- Data Source: OpenStreetMap (via Overpass API)
+- Icons: Lucide-react
+- Styling: Plain CSS with modern design principles
 
-## Expanding the ESLint configuration
+## Installation and Setup
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+### Prerequisites
+
+- Node.js (v18 or higher recommended)
+- npm or yarn
+
+### Steps
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/haumlab/mapsort
+   cd mapsort
+   ```
+
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+
+3. Start the development server:
+   ```bash
+   npm run dev
+   ```
+
+4. Open your browser and navigate to the address provided by Vite (usually http://localhost:5173).
+
+## How to Use
+
+1. Click on the map to select a starting point. MapSort will snap to the nearest street.
+2. Click again to select a destination point. The application will fetch the necessary OSM data to connect the two points.
+3. Choose an algorithm (or two in VS Mode) from the sidebar.
+4. Adjust the simulation speed and sound volume as desired.
+5. Click 'Visualize' to watch the algorithm explore the network and find the path.
+6. Click 'Reset' to clear the current points and graph data.
+
+## Important Note
+
+MapSort relies on public Overpass API instances. If there are connection issues or the service is under heavy load, there may be delays in fetching map data.
