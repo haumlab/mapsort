@@ -4,7 +4,7 @@ export function dijkstra(graph, startNode, endNode) {
     const distances = {};
     const previous = {};
     const pq = new PriorityQueue();
-    const visitedInOrder = []; // To track exploration for animation
+    const visitedInOrder = [];
     const nodes = Object.keys(graph.nodeCoords);
 
     nodes.forEach(node => {
@@ -32,7 +32,7 @@ export function dijkstra(graph, startNode, endNode) {
                 previous[nextNode] = currentNode;
                 pq.enqueue(nextNode, newDist);
 
-                // Track exploration: [fromCoord, toCoord]
+
                 visitedInOrder.push({
                     from: currentNode,
                     to: nextNode,

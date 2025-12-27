@@ -11,7 +11,7 @@ import { greedy } from './algorithms/greedy';
 import { fetchOSMData, processOSMData, getDistance } from './utils/osm_utils';
 import { playStepSound, playTraceSound } from './utils/audio';
 
-// Fix Leaflet marker Icon issues
+
 import icon from 'leaflet/dist/images/marker-icon.png';
 import iconShadow from 'leaflet/dist/images/marker-shadow.png';
 
@@ -23,7 +23,7 @@ let DefaultIcon = L.icon({
 });
 L.Marker.prototype.options.icon = DefaultIcon;
 
-// Custom Markers
+
 const StartIcon = L.divIcon({
   html: `<div style="background-color: #10b981; width: 12px; height: 12px; border-radius: 50%; border: 2px solid white; box-shadow: 0 0 10px rgba(16,185,129,0.5);"></div>`,
   className: 'custom-marker',
@@ -44,7 +44,7 @@ const ALGORITHMS = [
   { id: 'dfs', name: 'Depth-First', fn: dfs }
 ];
 
-// Component to handle zooming to path
+
 function PathZoom({ path }) {
   const map = useMap();
   useEffect(() => {
@@ -55,7 +55,7 @@ function PathZoom({ path }) {
   return null;
 }
 
-// Component to handle map clicks for selecting nodes
+
 function MapEvents({ onNodeSelect }) {
   useMapEvents({
     click: (e) => onNodeSelect(e.latlng)
@@ -89,12 +89,12 @@ export default function App() {
   const [isVisualizing, setIsVisualizing] = useState(false);
   const [isLoadingMap, setIsLoadingMap] = useState(false);
 
-  // For shared path calculation
+
   const [sharedPath, setSharedPath] = useState([]);
 
   useEffect(() => {
     if (path1 && path2) {
-      // Normalize edges (min-max) to detect overlap regardless of direction
+
       const p1Edges = new Set();
       for (let i = 0; i < path1.length - 1; i++) {
         const u = path1[i].join(',');
@@ -111,7 +111,7 @@ export default function App() {
 
       const shared = [];
 
-      // Calculate shared segments
+
       for (let i = 0; i < path1.length - 1; i++) {
         const u = path1[i].join(',');
         const v = path1[i + 1].join(',');
@@ -138,7 +138,7 @@ export default function App() {
       }
     });
 
-    // If nearest node is too far (> 1km), we might need new data
+
     if (minDest > 1000) return null;
     return nearestId;
   };
@@ -146,16 +146,16 @@ export default function App() {
   const mergeGraphs = (oldGraph, newGraph) => {
     if (!oldGraph) return newGraph;
 
-    // Merge nodeCoords
+
     const mergedCoords = { ...oldGraph.nodeCoords, ...newGraph.nodeCoords };
 
-    // Merge adjacencyList
+
     const mergedAdj = { ...oldGraph.adjacencyList };
     Object.entries(newGraph.adjacencyList).forEach(([u, edges]) => {
       if (!mergedAdj[u]) {
         mergedAdj[u] = edges;
       } else {
-        // Only add edges that aren't already there (by "to" node)
+
         const existingToNodes = new Set(mergedAdj[u].map(e => e.to));
         edges.forEach(edge => {
           if (!existingToNodes.has(edge.to)) {
@@ -172,7 +172,7 @@ export default function App() {
     if (isVisualizing || isLoadingMap) return;
 
     if (!startNode) {
-      // First click: Fetch area to snap start node
+
       const clickPoint = { lat: latlng.lat, lng: latlng.lng };
       setStartNode(clickPoint);
       setStatus('Finding nearest street...');
@@ -185,8 +185,7 @@ export default function App() {
 
         setGraph(prev => mergeGraphs(prev, processedGraph));
 
-        // Use the freshly computed merged graph if possible, but for simplicity let's use the local processed one first
-        // If it fails, the next tick of graph state will catch up
+
         const sId = findNearestNode(clickPoint, processedGraph);
         if (sId) {
           setStartNode(sId);
@@ -200,7 +199,7 @@ export default function App() {
         setIsLoadingMap(false);
       }
     } else if (typeof startNode === 'string' && !endNode) {
-      // Second click: End Node
+
       const clickPoint = { lat: latlng.lat, lng: latlng.lng };
       setEndNode(clickPoint);
       setStatus('Expanding map network...');
@@ -208,7 +207,7 @@ export default function App() {
       try {
         setIsLoadingMap(true);
         const startCoords = graph.nodeCoords[startNode];
-        // More generous BBox for the route
+
         const pad = 0.008;
         const minLat = Math.min(startCoords[0], clickPoint.lat) - pad;
         const maxLat = Math.max(startCoords[0], clickPoint.lat) + pad;
@@ -236,8 +235,7 @@ export default function App() {
         setIsLoadingMap(false);
       }
     } else {
-      // If we already have start and end, clicking again resets but KEEPS the graph
-      // This is the key: cumulative map building
+
       setStartNode(null);
       setEndNode(null);
       setVisited1([]);
@@ -256,7 +254,7 @@ export default function App() {
     if (!startNode || !endNode || !graph) return;
 
     setIsVisualizing(true);
-    // Reset state
+
     setVisited1([]); setPath1(null); setFullPath1(null); setMetrics1(null);
     setVisited2([]); setPath2(null); setFullPath2(null); setMetrics2(null);
 
@@ -269,18 +267,18 @@ export default function App() {
         const startTime = performance.now();
         const result = algoFn(graph, startNode, endNode);
 
-        // Check for null result or missing path
+
         if (!result || !result.visitedInOrder) {
           throw new Error("Algorithm failed to return a valid result.");
         }
 
-        // PHASE 1: Exploration
+
         const totalSteps = result.visitedInOrder.length;
-        const baseBatchSize = Math.max(2, Math.floor(totalSteps / 100)); // Smaller batches for more "process"
+        const baseBatchSize = Math.max(2, Math.floor(totalSteps / 100));
         const currentBatchSize = baseBatchSize * simSpeed;
 
         const allVisitedCoords = result.visitedInOrder.map(e => e.coords);
-        const delay = Math.max(0, 30 - simSpeed); // Real delay based on speed
+        const delay = Math.max(0, 30 - simSpeed);
 
         for (let i = 0; i < totalSteps; i += currentBatchSize) {
           const batch = allVisitedCoords.slice(i, i + currentBatchSize);
@@ -289,12 +287,12 @@ export default function App() {
           await new Promise(r => setTimeout(r, delay));
         }
 
-        // PHASE 2: Satisfying "Zip" Path Tracing
+
         if (result.path) {
           setStatus('Tracing path...');
           const fullPath = result.path;
 
-          // --- STABLE ZOOM TRIGGER ---
+
           setFullPath(fullPath);
 
           const targetFrames = 45;
@@ -375,7 +373,7 @@ export default function App() {
         </div>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-          {/* Algo 1 Selection */}
+
           <div className="algo-config">
             <div className="label-wrapper">
               <label className="label-sm">
@@ -403,7 +401,7 @@ export default function App() {
             )}
           </div>
 
-          {/* Algo 2 Selection (VS Mode only) */}
+
           {vsMode && (
             <div className="algo-config">
               <div className="label-wrapper">
@@ -432,7 +430,7 @@ export default function App() {
           )}
         </div>
 
-        {/* Settings Panel */}
+
         <div className="settings-group">
           <div className="setting-item">
             <div className="setting-header">
@@ -509,7 +507,7 @@ export default function App() {
 
         <MapEvents onNodeSelect={handleNodeSelect} />
 
-        {/* Algo 1 Exploration - Rendered as few multi-polylines for performance */}
+
         {visited1.length > 0 && (
           <Polyline
             positions={visited1}
@@ -517,7 +515,7 @@ export default function App() {
           />
         )}
 
-        {/* Algo 2 Exploration */}
+
         {vsMode && visited2.length > 0 && (
           <Polyline
             positions={visited2}
@@ -525,7 +523,7 @@ export default function App() {
           />
         )}
 
-        {/* Path 1 Layer (Bottom) */}
+
         {path1 && (
           <Polyline
             positions={path1}
@@ -533,7 +531,7 @@ export default function App() {
           />
         )}
 
-        {/* Path 2 Layer (Middle) */}
+
         {vsMode && path2 && (
           <Polyline
             positions={path2}
@@ -541,7 +539,7 @@ export default function App() {
           />
         )}
 
-        {/* Shared Path Layer (Top) */}
+
         {vsMode && sharedPath.length > 0 && (
           <Polyline
             positions={sharedPath}
@@ -549,10 +547,10 @@ export default function App() {
           />
         )}
 
-        {/* Combined Zoom - Now uses STABLE fullPath vars instead of animated ones */}
+
         {(fullPath1 || fullPath2) && <PathZoom path={[...(fullPath1 || []), ...(fullPath2 || []).reverse()]} />}
 
-        {/* Markers */}
+
         {startNode && (
           <Marker position={typeof startNode === 'string' ? graph.nodeCoords[startNode] : startNode} icon={StartIcon}>
             <Popup>Start Point</Popup>

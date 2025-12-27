@@ -1,5 +1,5 @@
 export function getDistance(lat1, lon1, lat2, lon2) {
-    const R = 6371e3; // metres
+    const R = 6371e3;
     const φ1 = lat1 * Math.PI / 180;
     const φ2 = lat2 * Math.PI / 180;
     const Δφ = (lat2 - lat1) * Math.PI / 180;
@@ -10,7 +10,7 @@ export function getDistance(lat1, lon1, lat2, lon2) {
         Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 
-    return R * c; // in metres
+    return R * c;
 }
 
 export function processOSMData(data) {
@@ -38,7 +38,7 @@ export function processOSMData(data) {
                 nodeCoords[v][0], nodeCoords[v][1]
             );
 
-            // Forward edge
+
             if (!adjacencyList[u]) adjacencyList[u] = [];
             adjacencyList[u].push({
                 to: v,
@@ -47,7 +47,7 @@ export function processOSMData(data) {
                 coords: [nodeCoords[u], nodeCoords[v]]
             });
 
-            // Backward edge
+
             const oneway = way.tags && way.tags.oneway === 'yes';
             if (!oneway) {
                 if (!adjacencyList[v]) adjacencyList[v] = [];
@@ -67,7 +67,7 @@ export function processOSMData(data) {
     };
 }
 
-// List of reliable Overpass API instances to try in order
+
 const OVERPASS_INSTANCES = [
     'https://overpass-api.de/api/interpreter',
     'https://lz4.overpass-api.de/api/interpreter',
@@ -86,18 +86,18 @@ export async function fetchOSMData(bbox) {
         out skel qt;
     `;
 
-    // Try each instance until one works
+
     for (const baseUrl of OVERPASS_INSTANCES) {
         try {
             console.log(`Trying OSM provider: ${baseUrl}`);
             const response = await fetch(baseUrl, {
                 method: 'POST',
-                body: `data=${encodeURIComponent(query)}`, // Overpass API expects 'data=' prefix for POST body
+                body: `data=${encodeURIComponent(query)}`,
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
             });
 
             if (!response.ok) {
-                // If 429 (Too Many Requests) or 5xx, throw to try next
+
                 if (response.status === 429 || response.status >= 500) {
                     throw new Error(`Status ${response.status}`);
                 }
@@ -106,11 +106,11 @@ export async function fetchOSMData(bbox) {
             }
 
             const data = await response.json();
-            return data; // Success!
+            return data;
 
         } catch (err) {
             console.warn(`Provider ${baseUrl} failed:`, err);
-            // Continue to next provider
+
         }
     }
 

@@ -23,7 +23,7 @@ html,
   overflow: hidden;
 }
 
-/* Glassmorphism Panel */
+
 .glass-panel {
   background: var(--panel-bg);
   backdrop-filter: blur(12px);
@@ -39,7 +39,7 @@ html,
   background: var(--bg-color) !important;
 }
 
-/* Custom Scrollbar */
+
 ::-webkit-scrollbar {
   width: 6px;
 }
@@ -53,7 +53,7 @@ html,
   border-radius: 10px;
 }
 
-/* UI Components */
+
 .control-sidebar {
   position: absolute;
   top: 20px;
@@ -108,7 +108,7 @@ html,
   outline: none;
 }
 
-/* Settings Section */
+
 .settings-group {
   display: flex;
   flex-direction: column;
@@ -131,7 +131,7 @@ html,
   align-items: center;
 }
 
-/* Custom Range Slider */
+
 input[type="range"] {
   -webkit-appearance: none;
   width: 100%;
@@ -156,7 +156,7 @@ input[type="range"]::-webkit-slider-thumb:hover {
   transform: scale(1.2);
 }
 
-/* Status Badge refinement */
+
 .status-badge {
   padding: 8px 12px;
   border-radius: 8px;
@@ -165,7 +165,7 @@ input[type="range"]::-webkit-slider-thumb:hover {
   border-left: 3px solid var(--accent-color);
 }
 
-/* VS Mode Toggle */
+
 .mode-toggle {
   cursor: pointer;
   user-select: none;
@@ -197,14 +197,14 @@ input[type="range"]::-webkit-slider-thumb:hover {
   text-align: center;
   transition: all 0.3s ease;
   padding: 0 40px;
-  /* Space for the thumb */
+
 }
 
 .toggle-track.active .toggle-label {
   color: var(--accent-color);
 }
 
-/* Algo Configuration */
+
 .algo-config {
   display: flex;
   flex-direction: column;
@@ -243,7 +243,7 @@ input[type="range"]::-webkit-slider-thumb:hover {
 .toggle-track.active .toggle-thumb {
   background: var(--accent-color);
   transform: translateX(232px);
-  /* Specifically tuned for the 320px sidebar */
+
   background-color: #fff;
   color: var(--accent-color);
   left: 6px;
@@ -279,7 +279,7 @@ input[type="range"]::-webkit-slider-thumb:hover {
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-/* Metrics Cards */
+
 .metrics-card {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -320,7 +320,7 @@ input[type="range"]::-webkit-slider-thumb:hover {
   }
 }
 
-/* Leaflet Overrides */
+
 .leaflet-bar {
   border: none !important;
 }
