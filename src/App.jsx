@@ -179,12 +179,11 @@ export default function App() {
 
       try {
         setIsLoadingMap(true);
-        const bbox = `${clickPoint.lat - 0.003},${clickPoint.lng - 0.003},${clickPoint.lat + 0.003},${clickPoint.lng + 0.003}`;
+        const bbox = `${clickPoint.lat - 0.005},${clickPoint.lng - 0.005},${clickPoint.lat + 0.005},${clickPoint.lng + 0.005}`;
         const data = await fetchOSMData(bbox);
         const processedGraph = processOSMData(data);
 
         setGraph(prev => mergeGraphs(prev, processedGraph));
-
 
         const sId = findNearestNode(clickPoint, processedGraph);
         if (sId) {
@@ -199,7 +198,6 @@ export default function App() {
         setIsLoadingMap(false);
       }
     } else if (typeof startNode === 'string' && !endNode) {
-
       const clickPoint = { lat: latlng.lat, lng: latlng.lng };
       setEndNode(clickPoint);
       setStatus('Expanding map network...');
@@ -207,8 +205,7 @@ export default function App() {
       try {
         setIsLoadingMap(true);
         const startCoords = graph.nodeCoords[startNode];
-
-        const pad = 0.008;
+        const pad = 0.015;
         const minLat = Math.min(startCoords[0], clickPoint.lat) - pad;
         const maxLat = Math.max(startCoords[0], clickPoint.lat) + pad;
         const minLng = Math.min(startCoords[1], clickPoint.lng) - pad;
@@ -250,7 +247,32 @@ export default function App() {
     }
   };
 
-  const visualize = async () => {
+  const expandMap = async () => {
+    if (!startNode || !endNode || typeof startNode !== 'string' || typeof endNode !== 'string') return;
+    setStatus('No path found. Auto-expanding search area...');
+    try {
+      setIsLoadingMap(true);
+      const startCoords = graph.nodeCoords[startNode];
+      const endCoords = graph.nodeCoords[endNode];
+      const pad = 0.04;
+      const minLat = Math.min(startCoords[0], endCoords[0]) - pad;
+      const maxLat = Math.max(startCoords[0], endCoords[0]) + pad;
+      const minLng = Math.min(startCoords[1], endCoords[1]) - pad;
+      const maxLng = Math.max(startCoords[1], endCoords[1]) + pad;
+      const bbox = `${minLat},${minLng},${maxLat},${maxLng}`;
+      const data = await fetchOSMData(bbox);
+      const processedGraph = processOSMData(data);
+      setGraph(prev => mergeGraphs(prev, processedGraph));
+      return true;
+    } catch (err) {
+      console.error('Expansion failed:', err);
+      return false;
+    } finally {
+      setIsLoadingMap(false);
+    }
+  };
+
+  const visualize = async (isRetry = false) => {
     if (!startNode || !endNode || !graph) return;
 
     setIsVisualizing(true);
@@ -325,18 +347,28 @@ export default function App() {
       }
     };
 
+    let success = false;
     if (vsMode) {
       const [r1, r2] = await Promise.all([
         runAlgo(algo1, setVisited1, setPath1, setMetrics1, setFullPath1),
         runAlgo(algo2, setVisited2, setPath2, setMetrics2, setFullPath2)
       ]);
-      if (r1 || r2) setStatus('Comparison complete!');
-      else setStatus('No path found. Try loading more map segments between points.');
+      success = r1 || r2;
     } else {
-      const found = await runAlgo(algo1, setVisited1, setPath1, setMetrics1, setFullPath1);
-      if (found) setStatus(`Path found!`);
-      else setStatus('No path found. Click roads between the points to expand the map.');
+      success = await runAlgo(algo1, setVisited1, setPath1, setMetrics1, setFullPath1);
     }
+
+    if (!success && !isRetry) {
+      const expanded = await expandMap();
+      if (expanded) {
+        setIsVisualizing(false);
+        setTimeout(() => visualize(true), 100);
+        return;
+      }
+    }
+
+    if (success) setStatus(vsMode ? 'Comparison complete!' : 'Path found!');
+    else setStatus('No path found. Click roads between the points to expand the map.');
 
     setIsVisualizing(false);
   };
