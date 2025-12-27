@@ -79,7 +79,7 @@ export async function fetchOSMData(bbox) {
     const query = `
         [out:json][timeout:25];
         (
-          way["highway"~"primary|secondary|tertiary|unclassified|residential|service|living_street|pedestrian|track"](${bbox});
+          way["highway"~"motorway|trunk|primary|secondary|tertiary|unclassified|residential|service|living_street|pedestrian|track|motorway_link|trunk_link|primary_link|secondary_link|tertiary_link"](${bbox});
         );
         out body;
         >;
